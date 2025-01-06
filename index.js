@@ -76,6 +76,10 @@ async function processBackup() {
         dumpCommand = `pg_dump "${databaseURI}" -F c > "${filepath}.dump"`;
         versionCommand = 'psql --version';
         break;
+      case 'postgres':
+        dumpCommand = `pg_dump "${databaseURI}" -F c > "${filepath}.dump"`;
+        versionCommand = 'psql --version';
+        break;
       case 'mongodb':
         dumpCommand = `mongodump --uri="${databaseURI}" --archive="${filepath}.dump"`;
         versionCommand = 'mongodump --version';
