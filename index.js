@@ -25,7 +25,6 @@ function loadConfig() {
       accessKeyId: process.env.AWS_ACCESS_KEY_ID,
       secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
       region: process.env.AWS_S3_REGION,
-      endpoint: process.env.AWS_S3_ENDPOINT,
       s3_bucket: process.env.AWS_S3_BUCKET
     },
     databases: process.env.DATABASES ? process.env.DATABASES.split(",") : [],
@@ -65,7 +64,7 @@ async function processBackup() {
     const ss = String(date.getSeconds()).padStart(2, '0');
     const timestamp = `${yyyy}-${mm}-${dd}_${hh}:${min}:${ss}`;
     const filename = `backup-${dbType}-${timestamp}-${dbName}-${dbHostname}.tar.gz`;
-    const filepath = `/tmp/${filename}`;
+    const filepath = `/${filename}`;
 
     console.log(`\n[${databaseIteration}/${totalDatabases}] ${dbType}/${dbName} Backup in progress...`);
 
