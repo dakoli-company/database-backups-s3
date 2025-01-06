@@ -104,12 +104,15 @@ async function processBackup() {
 
       // 1. Execute the dump command
       await exec(dumpCommand);
+      console.log("✅ 1. Dumped data");
 
       // 2. Compress the dump file
       await exec(`tar -czvf ${filepath} ${filepath}.dump`);
+      console.log("✅ 2. Compressed the dump file");
 
       // 3. Read the compressed file
       const data = fs.readFileSync(filepath);
+      console.log("✅ 3. Read compressed file");
 
       // 4. Upload to S3
       const params = {
@@ -121,12 +124,13 @@ async function processBackup() {
       const putCommand = new s3.PutObjectCommand(params);
       await s3Client.send(putCommand);
       
-      console.log(`✓ Successfully uploaded db backup for database ${dbType} ${dbName} ${dbHostname}.`);
+      console.log(`✅ 4. Successfully uploaded db backup for database ${dbType} ${dbName} ${dbHostname}.`);
 
       // 5. Clean up temporary files
       await exec(`rm -f ${filepath} ${filepath}.dump`);
     } catch (error) {
       console.error(`An error occurred while processing the database ${dbType} ${dbName}, host: ${dbHostname}): ${error}`);
+      console.error(error);
     }
   }
 }
