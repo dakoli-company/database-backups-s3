@@ -10,7 +10,6 @@ function loadConfig() {
     'AWS_ACCESS_KEY_ID',
     'AWS_SECRET_ACCESS_KEY',
     'AWS_S3_REGION',
-    'AWS_S3_ENDPOINT',
     'AWS_S3_BUCKET'
   ];
   
@@ -38,6 +37,7 @@ const config = loadConfig();
 const s3Client = new s3.S3Client(config.aws);
 
 async function processBackup() {
+  console.log("--------------------------------------------------");
   if (config.databases.length === 0) {
     console.log("No databases defined.");
     return;
@@ -66,31 +66,10 @@ async function processBackup() {
     const filename = `backup-${dbType}-${timestamp}-${dbName}-${dbHostname}.tar.gz`;
     const filepath = `/${filename}`;
 
+    
     console.log(`\n[${databaseIteration}/${totalDatabases}] ${dbType}/${dbName} Backup in progress...`);
-
-    let dumpCommand;
-    let versionCommand = 'echo "Unknown database type"';
-    switch (dbType) {
-      case 'postgresql':
-        dumpCommand = `pg_dump "${databaseURI}" -F c > "${filepath}.dump"`;
-        versionCommand = 'psql --version';
-        break;
-      case 'postgres':
-        dumpCommand = `pg_dump "${databaseURI}" -F c > "${filepath}.dump"`;
-        versionCommand = 'psql --version';
-        break;
-      case 'mongodb':
-        dumpCommand = `mongodump --uri="${databaseURI}" --archive="${filepath}.dump"`;
-        versionCommand = 'mongodump --version';
-        break;
-      case 'mysql':
-        dumpCommand = `mysqldump -u ${dbUser} -p${dbPassword} -h ${dbHostname} -P ${dbPort} ${dbName} > "${filepath}.dump"`;
-        versionCommand = 'mysql --version';
-        break;
-      default:
-        console.log(`Unknown database type: ${dbType}`);
-        return;
-    }
+    let dumpCommand = `pg_dump "${databaseURI}" -F c > "${filepath}.dump"`;
+    let versionCommand = 'psql --version';
 
     try {
       // Log database client version
@@ -127,6 +106,7 @@ async function processBackup() {
 
       // 5. Clean up temporary files
       await exec(`rm -f ${filepath} ${filepath}.dump`);
+      console.log("✅ 5. Cleaned temporary files");
     } catch (error) {
       console.error(`An error occurred while processing the database ${dbType} ${dbName}, host: ${dbHostname}): ${error}`);
       console.error(error);
