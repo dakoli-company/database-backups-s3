@@ -107,6 +107,12 @@ async function processBackup() {
       // 5. Clean up temporary files
       await exec(`rm -f ${filepath} ${filepath}.dump`);
       console.log("✅ 5. Cleaned temporary files");
+
+      // 6. Clean memory
+      if (global.gc) {
+        global.gc();
+        console.log("✅ 6. Cleaned memory");
+      }
     } catch (error) {
       console.error(`An error occurred while processing the database ${dbType} ${dbName}, host: ${dbHostname}): ${error}`);
       console.error(error);

@@ -24,4 +24,4 @@ COPY ./ /root
 # Install PostgreSQL
 RUN apk add --update --no-cache postgresql16-client nodejs npm
 
-ENTRYPOINT ["node", "index.js"]
+ENTRYPOINT ["node", "index.js", "--expose-gc"]
