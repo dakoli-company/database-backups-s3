@@ -3,7 +3,6 @@ const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 const s3 = require("@aws-sdk/client-s3");
 const fs = require('fs');
-const cron = require("cron");
 
 function loadConfig() {
   const requiredEnvars = [
@@ -27,8 +26,6 @@ function loadConfig() {
       s3_bucket: process.env.AWS_S3_BUCKET
     },
     databases: process.env.DATABASES ? process.env.DATABASES.split(",") : [],
-    run_on_startup: process.env.RUN_ON_STARTUP === 'true' ? true : false,
-    cron: process.env.CRON,
   };
 }
 
@@ -112,23 +109,14 @@ async function processBackup() {
       if (global.gc) {
         global.gc();
         console.log("✅ 6. Cleaned memory");
-      }
+      }  
     } catch (error) {
       console.error(`An error occurred while processing the database ${dbType} ${dbName}, host: ${dbHostname}): ${error}`);
       console.error(error);
+    } finally {
+       process.exit(); 
     }
   }
 }
 
-if (config.cron) {
-  const CronJob = cron.CronJob;
-  const job = new CronJob(config.cron, processBackup);
-  job.start();
-  
-  console.log(`Backups configured on Cron job schedule: ${config.cron}`);
-}
-
-if (config.run_on_startup) {
-  console.log("run_on_startup enabled, backing up now...")
-  processBackup();
-}
+processBackup();
